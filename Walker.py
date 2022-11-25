@@ -32,11 +32,12 @@ class Walker():
         self.setrandomdirection()
         self.move = 0
         self.runes = 0
-        self.item = False
+        self.item = None
         self.victory = False
         self.logging = logging
 
     def log(self, message):
+
         if self.logging:
             print(self.messages[message].format(self=self))
 
@@ -62,42 +63,43 @@ class Walker():
         self.victory = True
 
     def inspectfeature(self):
-        match self.feature:
-            case Other('tele'):
+        match self.feature, self.item:
+            case Other('tele'), _:
                 self.log('tele')
                 self.setrandomroom()
                 self.setrandomdirection()
                 self.inspectfeature()
-            case Orb():
+            case Orb(), None:
                 self.log('orb')
-                if self.item:
-                    self.log('full')
-                else:
-                    self.log('grab')
-                    self.item = self.feature
-                    self.feature = None
-            case Rune(color):
+                self.item = self.feature
+                self.feature = None
+                self.log('grab')
+            case Orb(), _:
+                self.log('orb')
+                self.log('full')
+            case Rune(rcolor), Orb(ocolor) if rcolor == ocolor:
                 self.log('rune')
-                if self.item == Orb(color):
-                    self.log('insert')
-                    self.item = None
-                    self.feature = None
-                    self.runes += 1
-                else:
-                    self.log('missing')
+                self.log('insert')
+                self.item = None
+                self.feature = None
+                self.runes += 1
+            case Rune(), _:
+                self.log('rune')
+                self.log('missing')
 
     def resolvemovement(self):
             self.move += 1
+            x, y = self.room
             match self.direction:
-                case 0: self.room = (self.room[0], self.room[1]-1)
-                case 1: self.room = (self.room[0]+1, self.room[1])
-                case 2: self.room = (self.room[0], self.room[1]+1)
-                case 3: self.room = (self.room[0]-1, self.room[1])
+                case 0: self.room = (x, y-1)
+                case 1: self.room = (x+1, y)
+                case 2: self.room = (x, y+1)
+                case 3: self.room = (x-1, y)
             match self.room, self.runes:
                 case (-1|8, _), 5: self.win()
                 case (_, -1|8), 5: self.win()
-                case (-1|8, _), _: self.room = ((self.room[0] + 8) % 8, (self.room[1] + 4) % 8)
-                case (_, -1|8), _: self.room = ((self.room[0] + 4) % 8, (self.room[1] + 8) % 8)
+                case ((-1|8) as x, y), _: self.room = ((x + 8) % 8, (y + 4) % 8)
+                case (x, (-1|8) as y), _: self.room = ((x + 4) % 8, (y + 8) % 8)
 
     def randomchoice(self):
         match len(self.options):
