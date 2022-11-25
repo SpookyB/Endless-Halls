@@ -71,9 +71,9 @@ class Walker():
                 self.inspectfeature()
             case Orb(), None:
                 self.log('orb')
+                self.log('grab')
                 self.item = self.feature
                 self.feature = None
-                self.log('grab')
             case Orb(), _:
                 self.log('orb')
                 self.log('full')
