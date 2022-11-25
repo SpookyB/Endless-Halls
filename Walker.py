@@ -96,10 +96,12 @@ class Walker():
                 case 2: self.room = (x, y+1)
                 case 3: self.room = (x-1, y)
             match self.room, self.runes:
-                case (-1|8, _), 5: self.win()
-                case (_, -1|8), 5: self.win()
-                case ((-1|8) as x, y), _: self.room = ((x + 8) % 8, (y + 4) % 8)
-                case (x, (-1|8) as y), _: self.room = ((x + 4) % 8, (y + 8) % 8)
+                case ((-1|8), _) | (_, (-1|8)), 5:
+                    self.win()
+                case ((-1|8) as x, y), _:
+                    self.room = ((x + 8) % 8, (y + 4) % 8)
+                case (x, (-1|8) as y), _:
+                    self.room = ((x + 4) % 8, (y + 8) % 8)
 
     def randomchoice(self):
         match len(self.options):
