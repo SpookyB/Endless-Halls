@@ -38,7 +38,7 @@ class Walker():
 
     def log(self, message):
         if self.logging:
-            print(message.format(self=self))
+            print(self.messages[message].format(self=self))
 
     def setrandomroom(self):
         self.room = (randint(0,7), randint(0,7))
@@ -58,33 +58,33 @@ class Walker():
         self.features[self.room[1]][self.room[0]] = value
 
     def win(self):
-        self.log(self.messages['victory'])
+        self.log('victory')
         self.victory = True
 
     def inspectfeature(self):
         match self.feature:
             case Other('tele'):
-                self.log(self.messages['tele'])
+                self.log('tele')
                 self.setrandomroom()
                 self.setrandomdirection()
                 self.inspectfeature()
             case Orb():
-                self.log(self.messages['orb'])
+                self.log('orb')
                 if self.item:
-                    self.log(self.messages['full'])
+                    self.log('full')
                 else:
-                    self.log(self.messages['grab'])
+                    self.log('grab')
                     self.item = self.feature
                     self.feature = None
             case Rune(color):
-                self.log(self.messages['rune'])
+                self.log('rune')
                 if self.item == Orb(color):
-                    self.log(self.messages['insert'])
+                    self.log('insert')
                     self.item = None
                     self.feature = None
                     self.runes += 1
                 else:
-                    self.log(self.messages['missing'])
+                    self.log('missing')
 
     def resolvemovement(self):
             self.move += 1
