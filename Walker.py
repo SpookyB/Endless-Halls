@@ -25,6 +25,12 @@ class Walker():
         'missing': '\tYou are not carrying the matching orb.',
         'victory': 'You reached the room of inscription on move {self.move}!'}
 
+    offsets = {
+        0: (0, -1),
+        1: (+1, 0),
+        2: (0, +1),
+        3: (-1, 0)}
+
     def __init__(self, paths, features, logging=False):
         self.paths = paths
         self.features = features
@@ -89,12 +95,8 @@ class Walker():
 
     def resolvemovement(self):
             self.move += 1
-            x, y = self.room
-            match self.direction:
-                case 0: self.room = (x, y-1)
-                case 1: self.room = (x+1, y)
-                case 2: self.room = (x, y+1)
-                case 3: self.room = (x-1, y)
+            offset = self.offsets[self.direction]
+            self.room = (self.room[0] + offset[0], self.room[1] + offset[1])
             match self.room, self.runes:
                 case ((-1|8), _) | (_, (-1|8)), 5:
                     self.win()
